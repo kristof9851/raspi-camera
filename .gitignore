@@ -1,2 +1,4 @@
 static/photo/*
 !static/photo/.placeholder
+
+__pycache__
