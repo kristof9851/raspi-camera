@@ -5,6 +5,7 @@ import logging
 from src.routes import stream, camera, photo, root, login, logout, dashboard
 from src.database import fake_users_db
 from src.sessions import sessions, SESSION_COOKIE_NAME, authenticate_user
+from fastapi.responses import RedirectResponse
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -14,13 +15,12 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        if request.url.path.startswith("/static"):
+        if request.url.path.startswith("/static") or request.url.path in ["/photo", "/stream", "/camera", "/dashboard"]:
             session_token = request.cookies.get(SESSION_COOKIE_NAME)
             if not session_token or session_token not in sessions:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Not authenticated",
-                )
+                # Redirect to login page with an error message
+                redirect_url = f"/?error=Not%20authenticated"
+                return RedirectResponse(url=redirect_url, status_code=status.HTTP_302_FOUND)
         response = await call_next(request)
         return response
 
