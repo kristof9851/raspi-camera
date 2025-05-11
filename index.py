@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, status, Request, Response
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 import logging
-from src.routes import stream, camera, photo, root, login, logout, dashboard
+from src.routes import stream, camera, photo, home, login, logout, dashboard
 from src.database import fake_users_db
 from src.sessions import sessions, SESSION_COOKIE_NAME, authenticate_user
 from fastapi.responses import RedirectResponse
@@ -39,7 +39,7 @@ app.include_router(dashboard.router, dependencies=[Depends(authenticate_user)])
 app.mount("/static", StaticFiles(directory="./static"), name="static")
 
 # Include other routes without authentication
-app.include_router(root.router)
+app.include_router(home.router)
 app.include_router(login.router)
 app.include_router(logout.router)
 

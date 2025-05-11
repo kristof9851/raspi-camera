@@ -2,3 +2,7 @@ static/photo/*
 !static/photo/.placeholder
 
 __pycache__
+
+venv
+
+src/database.py
