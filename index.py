@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, status, Request, Response
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 import logging
-from src.routes import stream, camera, photo, home, login, logout, dashboard
+from src.routes import stream, video, photo, home, login, logout, dashboard
 from src.database import fake_users_db
 from src.sessions import sessions, SESSION_COOKIE_NAME, authenticate_user
 from fastapi.responses import RedirectResponse
@@ -15,7 +15,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        if request.url.path.startswith("/static") or request.url.path in ["/photo", "/stream", "/camera", "/dashboard"]:
+        if request.url.path.startswith("/static") or request.url.path in ["/photo", "/stream", "/video", "/dashboard"]:
             session_token = request.cookies.get(SESSION_COOKIE_NAME)
             if not session_token or session_token not in sessions:
                 # Redirect to login page with an error message
@@ -29,10 +29,10 @@ app = FastAPI()
 # Add middleware for static file protection
 app.add_middleware(AuthMiddleware)
 
-# Protect the /photo, /stream, /camera, and /dashboard routers
+# Protect the /photo, /stream, /video, and /dashboard routers
 app.include_router(photo.router, dependencies=[Depends(authenticate_user)])
 app.include_router(stream.router, dependencies=[Depends(authenticate_user)])
-app.include_router(camera.router, dependencies=[Depends(authenticate_user)])
+app.include_router(video.router, dependencies=[Depends(authenticate_user)])
 app.include_router(dashboard.router, dependencies=[Depends(authenticate_user)])
 
 # Mount the directory to serve static files
