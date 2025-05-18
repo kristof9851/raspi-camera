@@ -8,8 +8,9 @@ router = APIRouter()
 
 @router.post("/login")
 async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
+    print(f"Logging in user: {form_data.username}, password: {form_data.password}")
     user = fake_users_db.get(form_data.username)
-    print(user)
+    print("Found user: ", user)
     if not user or user["password"] != form_data.password:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

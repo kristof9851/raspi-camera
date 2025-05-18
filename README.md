@@ -1,7 +1,7 @@
 # raspi-camera
 
-## venv
-`python3 -m venv --system-site-packages env`
+## Install
 
-## picamera2 insallation
+
+## picamera2 installation
 https://forums.raspberrypi.com/viewtopic.php?t=361758
