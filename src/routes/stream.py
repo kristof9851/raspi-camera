@@ -1,39 +1,56 @@
+import io
+from threading import Condition
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
+from picamera2 import Picamera2
+from picamera2.encoders import MJPEGEncoder
+from picamera2.outputs import FileOutput
+from fastapi.requests import Request
 import subprocess
 import logging
 
 router = APIRouter()
 
-def generate_camera_frames():
-    process = subprocess.Popen(
-        [
-            "libcamera-vid", "--inline", "-o", "-", "-t", "0", "--framerate", "24", "--width", "640", "--height", "480"
-        ],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        bufsize=10**8
-    )
+picam2 = Picamera2()
+picam2.configure(picam2.create_video_configuration(main={"size": (640, 480)}))
+
+
+class StreamingOutput(io.BufferedIOBase):
+    def __init__(self):
+        self.frame = None
+        self.condition = Condition()
+
+    def write(self, buf):
+        with self.condition:
+            self.frame = buf
+            self.condition.notify_all()
+
+
+async def mjpeg_stream(request: Request):
+    print("mjpeg_stream starting...")
 
     try:
+        output = StreamingOutput()
+        picam2.start_recording(MJPEGEncoder(), FileOutput(output))
         while True:
-            frame = process.stdout.read(1024)
-            if not frame:
+            if await request.is_disconnected():
+                print("Client disconnected")
                 break
-            yield frame
-    except Exception as e:
-        logging.error(f"Error in generate_camera_frames: {e}")
+
+            with output.condition:
+                output.condition.wait()
+                frame = output.frame
+            
+            yield (b'--FRAME\r\n'
+                   b'Content-Type: image/jpeg\r\n'
+                   b'Content-Length: ' + f"{len(frame)}".encode() + b'\r\n\r\n' +
+                   frame + b'\r\n')
     finally:
-        process.terminate()
-        process.wait()
+        print("Finally...")
+        picam2.stop_recording()
 
-        # Log stderr output for debugging
-        libcamera_stderr = process.stderr.read().decode('utf-8')
-        logging.debug(f"libcamera-vid stderr: {libcamera_stderr}")
-
-        logging.debug("Process terminated.")
+    print("mjpeg_stream finished")
 
 @router.get("/stream")
-async def stream_camera():
-    logging.info("/stream endpoint accessed.")
-    return StreamingResponse(generate_camera_frames(), media_type="video/h264")
+async def stream_camera(request: Request):
+    return StreamingResponse(mjpeg_stream(request), media_type="multipart/x-mixed-replace; boundary=FRAME")

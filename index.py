@@ -5,7 +5,8 @@ import logging
 from src.routes import stream, video, photo, home, login, logout, dashboard
 from src.database import fake_users_db
 from src.sessions import sessions, SESSION_COOKIE_NAME, authenticate_user
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, StreamingResponse, FileResponse
+import socket
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
