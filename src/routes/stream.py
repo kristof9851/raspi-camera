@@ -12,7 +12,7 @@ import logging
 router = APIRouter()
 
 picam2 = Picamera2()
-picam2.configure(picam2.create_video_configuration(main={"size": (640, 480)}))
+picam2.configure(picam2.create_video_configuration(main={"size": (1920, 1080)}))
 
 
 class StreamingOutput(io.BufferedIOBase):
