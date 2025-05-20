@@ -37,7 +37,7 @@ app.include_router(video.router, dependencies=[Depends(authenticate_user)])
 app.include_router(dashboard.router, dependencies=[Depends(authenticate_user)])
 
 # Mount the directory to serve static files
-app.mount("/static", StaticFiles(directory="./static"), name="static")
+app.mount("/static", StaticFiles(directory="/home/kristof/work/github.com/kristof9851/raspi-camera/static"), name="static")
 
 # Include other routes without authentication
 app.include_router(home.router)
@@ -45,4 +45,10 @@ app.include_router(login.router)
 app.include_router(logout.router)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8443)
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=8443 #,
+        # ssl_certfile="/path/to/your/certificate.crt",  # Replace with your certificate file path
+        # ssl_keyfile="/path/to/your/private.key"       # Replace with your private key file path
+    )

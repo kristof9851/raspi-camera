@@ -6,7 +6,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")  # Directory for templates
+templates = Jinja2Templates(directory="/home/kristof/work/github.com/kristof9851/raspi-camera/templates")  # Directory for templates
 
 @router.get("/photo")
 async def capture_photo(request: Request):
