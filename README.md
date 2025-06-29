@@ -74,3 +74,46 @@ Once the server is running, you can access the live video stream by opening a we
 `http://<your-pi-ip-address>:8000`
 
 Replace `<your-pi-ip-address>` with the actual IP address of your Raspberry Pi. The recorded video segments will be saved in the `recordings` folder.
+
+## Running as a Systemd Service
+
+To ensure the server starts automatically on boot and runs reliably in the background, you can set it up as a `systemd` service.
+
+1.  **Create the service file:**
+    Create a file named `raspi-camera.service` in `/etc/systemd/system/` with the following content:
+
+    ```ini
+    [Unit]
+    Description=Raspberry Pi Camera Server
+    After=network.target
+
+    [Service]
+    User=kristof
+    WorkingDirectory=/home/kristof/work/github.com/kristof9851/raspi-camera/
+    ExecStart=/bin/bash -c "source /home/kristof/work/github.com/kristof9851/raspi-camera/venv/bin/activate && /home/kristof/work/github.com/kristof9851/raspi-camera/start.sh"
+    Restart=always
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+
+
+2.  **Reload systemd daemon:**
+    ```bash
+    sudo systemctl daemon-reload
+    ```
+
+3.  **Enable the service to start on boot:**
+    ```bash
+    sudo systemctl enable raspi-camera.service
+    ```
+
+4.  **Start the service immediately:**
+    ```bash
+    sudo systemctl start raspi-camera.service
+    ```
+
+5.  **Check the service status (optional, but recommended):**
+    ```bash
+    sudo systemctl status raspi-camera.service
+    ```
