@@ -1,8 +1,17 @@
+<!DOCTYPE html>
 <html>
-    <body>
-        <h1>Welcome, {{ username }}!</h1>
-        <a href="/photo">Go to Photo Page</a><br>
-        <a href="/video">Go to Video Page</a><br>
-        <a href="/logout">Logout</a>
-    </body>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h2>Welcome to the Dashboard!</h2>
+    {% if camera_available %}
+        <p><a href="/camera">View Camera Feed</a></p>
+    {% else %}
+        <p>Camera is currently offline or busy. Video feed not available.</p>
+    {% endif %}
+    <form method="POST" action="/logout">
+        <input type="submit" value="Logout">
+    </form>
+</body>
 </html>

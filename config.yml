@@ -1,0 +1,17 @@
+camera:
+  resolution:
+    width: 640
+    height: 480
+  recordings_folder: "recordings"
+  chunk_size_seconds: 600
+  max_chunks: 10
+server:
+  host: "0.0.0.0"
+  port: 8443
+  rate_limiting:
+    login:
+      calls: 5
+      period_seconds: 60
+    default:
+      per_day: 200
+      per_hour: 50

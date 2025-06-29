@@ -1,8 +1,13 @@
-static/photo/*
-!static/photo/.placeholder
+OLD/static/photo/*
+!OLD/static/photo/.placeholder
 
 __pycache__
 
 venv
+OLD//venv
 
-src/database.py
+OLD/src/database.py
+
+server_output.log
+
+recordings/*.h264
