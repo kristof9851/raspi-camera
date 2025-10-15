@@ -26,7 +26,7 @@ This project turns a Raspberry Pi with a camera module into a video surveillance
 
 2.  **Create and activate a virtual environment (recommended):**
     ```bash
-    python3 -m venv venv
+    python3 -m venv --system-site-packages venv
     source venv/bin/activate
     ```
 
@@ -62,6 +62,7 @@ server:
 To start the server, run the following command from the project's root directory:
 
 ```bash
+source venv/bin/activate
 python3 index.py
 ```
 

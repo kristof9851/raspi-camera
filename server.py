@@ -5,6 +5,18 @@ from threading import Condition
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import logging
+
+loggingFormat = "%(asctime)s [%(levelname)s] %(filename)s:%(lineno)s - %(message)s"
+logging.basicConfig(level=logging.INFO,
+                    format=loggingFormat,
+                    datefmt="%Y-%m-%dT%H:%M:%SZ",
+                    filename='/home/kristof/work/github.com/kristof9851/raspi-camera/raspi-camera-server.log',
+                    filemode='a')
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+console.setFormatter(logging.Formatter(loggingFormat, datefmt="%Y-%m-%d %H:%M:%S"))
+logging.getLogger('').addHandler(console)
 
 # The StreamingOutput class is a file-like object that captures the video stream.
 class StreamingOutput(io.BufferedIOBase):
@@ -117,7 +129,6 @@ def video_feed():
 
 # Function to run the Flask app
 def run_app(camera, host, port, threaded, config):
-    global limiter
     global global_camera
     global_camera = camera # Set the global camera object
 
@@ -130,10 +141,11 @@ def run_app(camera, host, port, threaded, config):
         ],
         storage_uri="memory://",
     )
-    limiter.limit(f"{config['server']['rate_limiting']['login']['calls']} per {config['server']['rate_limiting']['login']['period_seconds']} seconds")(login)
+
+    limiter.limit('10 per 60 seconds')(login)
 
     # Start the camera streaming and recording only if camera is available.
     if camera:
         camera.start_streaming(output)
-        camera.start_recording_segments()
+        # camera.start_recording_segments()
     app.run(host=host, port=port, threaded=threaded)

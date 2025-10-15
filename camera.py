@@ -26,6 +26,7 @@ class Camera:
 
     # Starts recording the video stream to the given output.
     def start_streaming(self, output):
+        logging.info("Starting web streaming...")
         self.output = output
         encoder = JpegEncoder()
         self.picam2.start_recording(encoder, FileOutput(self.output))
@@ -33,7 +34,7 @@ class Camera:
 
     # Starts recording the video to a file in chunks using FFmpeg.
     def start_recording_segments(self):
-        logging.info("Attempting to start H264 video recording segments using FFmpeg.")
+        logging.info("Starting to record video segments...")
         self.recordings_folder = self.config['camera']['recordings_folder']
         os.makedirs(self.recordings_folder, exist_ok=True)
 
@@ -70,9 +71,11 @@ class Camera:
         def manage_chunks():
             logging.info("FFmpeg chunk management thread started.")
             while True:
+                logging.info("Sleeping...")
                 time.sleep(self.config['camera']['chunk_size_seconds'])
                 video_files = sorted(glob.glob(os.path.join(self.recordings_folder, "*.h264")), key=os.path.getmtime)
                 if len(video_files) > self.config['camera']['max_chunks']:
+                    logging.info(f"Found {len(video_files)} video chunks, exceeding max of {self.config['camera']['max_chunks']}. Deleting oldest...")
                     for i in range(len(video_files) - self.config['camera']['max_chunks']):
                         os.remove(video_files[i])
                         logging.info(f"Deleted old video chunk: {video_files[i]}")

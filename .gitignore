@@ -11,3 +11,5 @@ OLD/src/database.py
 server_output.log
 
 recordings/*.h264
+
+raspi-camera-server.log
